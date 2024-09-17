@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "framer-motion": "^11.5.4",
-    "react-hot-toast": "^2.4.1",
-    "react-typewriter-effect": "^1.1.0"
-  }
-}
