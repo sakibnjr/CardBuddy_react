@@ -25,7 +25,7 @@ const Login = () => {
 
   return (
     <section className="py-14 bg-white">
-      <div className="container w-4/5 mx-auto px-4">
+      <div className="container md:w-4/5 mx-auto px-4">
         <div className="max-w-lg mx-auto bg-blue-50 p-6 rounded-lg shadow-md">
           <h1 className="text-4xl font-bold text-blue-800 mb-8 text-center">
             Login
@@ -58,7 +58,7 @@ const Login = () => {
             </button>
           </form>
           <p className="text-center text-gray-600 mt-4">
-            Don't have an account?
+            Don't have an account? <br />
             <NavLink to="/register" className="text-blue-700 font-semibold">
               Register here
             </NavLink>
