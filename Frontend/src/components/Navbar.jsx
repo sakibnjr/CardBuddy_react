@@ -17,7 +17,10 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   // Handle logout functionality
   const handleLogout = () => {
     localStorage.setItem("loggedIn", "false");
-    //localStorage.removeItem("user"); // optional: remove user data if needed
+    localStorage.removeItem("user");
+    localStorage.removeItem("mailAddress");
+    localStorage.removeItem("passWord");
+
     setIsLoggedIn(false);
   };
 
