@@ -1,105 +1,136 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
+import { PuffLoader } from "react-spinners";
+import { BsCreditCard } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({ setIsLoggedIn }) => {
-  const [userName, setUserName] = useState("");
+const Dashboard = () => {
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
+  // Fetch user data from localStorage on component mount
   useEffect(() => {
-    const loggedIn = localStorage.getItem("loggedIn");
-    const user = localStorage.getItem("user");
+    const storedUserData = localStorage.getItem("user");
 
-    setIsLoggedIn(loggedIn === "true");
-    setUserName(user || "User");
-  }, []);
+    if (storedUserData) {
+      setUserData(JSON.parse(storedUserData));
+    } else {
+      toast.error("User not logged in. Please log in first.");
+      navigate("/login");
+    }
+
+    setLoading(false);
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100">
+        <PuffLoader size={60} color="#4A90E2" />
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container w-4/5 mx-auto px-4">
-        {/* Animated Greeting Section */}
-        <motion.p
-          id="greeting"
-          className="text-2xl text-center text-gray-600"
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {`Hello, ${userName}! Welcome back to CardBuddy.`}
-        </motion.p>
-
-        <motion.h1
-          className="text-4xl font-bold text-blue-800 m-6 text-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          Dashboard
-        </motion.h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Virtual Card Information */}
-          <motion.div
-            className="bg-blue-50 p-6 rounded-lg shadow-md flex flex-col justify-between"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-          >
-            <h2 className="text-2xl font-semibold text-blue-700 mb-4">
-              Your Virtual Card
-            </h2>
-            <ul className="text-gray-600 space-y-4 mb-2">
-              <li>Card Number: 1234 5678 9012 3456</li>
-              <li>Expiry Date: 12/24</li>
-              <li>CVV: 214</li>
-              <li>
-                Card Status: <span className="text-green-600">Active</span>
-              </li>
-            </ul>
-            <button className="btn btn-primary">Manage Card</button>
-          </motion.div>
-
-          {/* Balance Section */}
-          <motion.div
-            className="bg-blue-50 p-6 rounded-lg shadow-md flex flex-col justify-between"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
-          >
-            <h2 className="text-2xl font-semibold text-blue-700 mb-4">
-              Your Balance
-            </h2>
-            <p className="text-3xl font-bold text-gray-800 mb-4">$0.00</p>
-            <button className="btn btn-primary">Top Up Now</button>
-          </motion.div>
-
-          {/* Transaction History */}
-          <motion.div
-            className="bg-blue-50 p-6 rounded-lg shadow-md flex flex-col justify-between"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 2 }}
-          >
-            <h2 className="text-2xl font-semibold text-blue-700 mb-4">
-              Transaction History
-            </h2>
-            <ul className="text-gray-600 space-y-2 mb-2">
-              <li>
-                Amazon - <strong>$20.00</strong> - 02/09/2024
-              </li>
-              <li>
-                Spotify - <strong>$10.00</strong> - 01/09/2024
-              </li>
-              <li>
-                Netflix - <strong>$15.00</strong> - 25/08/2024
-              </li>
-              <li>
-                Apple Store - <strong>$50.00</strong> - 20/08/2024
-              </li>
-            </ul>
-            <button className="btn btn-primary">View All Transactions</button>
-          </motion.div>
-        </div>
+    <motion.div
+      className="container mx-auto w-4/5 p-6 bg-gradient-to-br from-indigo-500 to-purple-500 text-white my-4 rounded-md"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Welcome, {userData?.userName}!</h1>
+        <p className="text-lg mt-2">Here's your dashboard overview:</p>
       </div>
-    </section>
+
+      {/* Card and Balance Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Card Info */}
+        <motion.div
+          className="bg-white rounded-lg shadow-lg p-6 text-gray-800"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h2 className="text-xl font-bold mb-4">Your Virtual Card</h2>
+          <div className="flex items-center space-x-4">
+            <BsCreditCard size={36} className="text-indigo-600" />
+            <div>
+              <p className="text-lg font-semibold">
+                {userData?.card.number || "**** **** **** ****"}
+              </p>
+              <p className="text-sm text-gray-500">
+                Expiry: {userData?.card.expiry || "MM/YY"}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Balance Info */}
+        <motion.div
+          className="bg-white rounded-lg shadow-lg p-6 text-gray-800"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h2 className="text-xl font-bold mb-4">Your Balance</h2>
+          <p className="text-3xl font-semibold">
+            ${userData?.balance?.toFixed(2) || "0.00"}
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Transactions Section */}
+      <motion.div
+        className="bg-white rounded-lg shadow-lg p-6 text-gray-800"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <h2 className="text-xl font-bold mb-4">Recent Transactions</h2>
+        {userData?.transactions && userData.transactions.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userData.transactions.map((transaction, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{transaction.description}</td>
+                    <td
+                      className={`${
+                        transaction.amount >= 0
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      ${transaction.amount.toFixed(2)}
+                    </td>
+                    <td>{new Date(transaction.date).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-gray-500">No recent transactions available.</p>
+        )}
+      </motion.div>
+    </motion.div>
   );
 };
 

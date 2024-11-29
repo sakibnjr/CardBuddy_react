@@ -1,72 +1,127 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
+import { AiOutlineMail, AiOutlineLock } from "react-icons/ai";
+import { PuffLoader } from "react-spinners";
+import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Login = ({ setIsLoggedIn }) => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const storedMail = localStorage.getItem("mailAddress");
-    const storedPassword = localStorage.getItem("passWord");
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    if (storedMail === email && storedPassword === password) {
-      toast.success("Login successful!");
-      localStorage.setItem("loggedIn", "true");
-      navigate("/dashboard");
-    } else {
-      toast.error("Wrong username or password!");
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        toast.success("Login successful!");
+        setIsLoggedIn(true);
+        navigate("/dashboard"); // Redirect to dashboard or home
+      } else {
+        toast.error(data.error || "Invalid credentials");
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <section className="py-14 bg-white">
-      <div className="container md:w-4/5 mx-auto px-4">
-        <div className="max-w-lg mx-auto bg-blue-50 p-6 rounded-lg shadow-md">
-          <h1 className="text-4xl font-bold text-blue-800 mb-8 text-center">
-            Login
-          </h1>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Email
-              </label>
+    <motion.div
+      className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-600 to-purple-500"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="card w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
+        <h2 className="text-2xl font-bold text-center text-purple-600 mb-6">
+          Login
+        </h2>
+
+        <form onSubmit={handleSubmit}>
+          {/* Email Input */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text text-gray-700">Email</span>
+            </label>
+            <div className="flex items-center border rounded-lg px-3 py-2">
+              <AiOutlineMail className="text-gray-500 mr-2" />
               <input
                 type="email"
-                className="input input-bordered w-full"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="input input-ghost w-full"
               />
             </div>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Password
-              </label>
+          </div>
+
+          {/* Password Input */}
+          <div className="form-control mb-4">
+            <label className="label">
+              <span className="label-text text-gray-700">Password</span>
+            </label>
+            <div className="flex items-center border rounded-lg px-3 py-2">
+              <AiOutlineLock className="text-gray-500 mr-2" />
               <input
                 type="password"
-                className="input input-bordered w-full"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="input input-ghost w-full"
               />
             </div>
-            <button type="submit" className="btn btn-primary w-full">
-              Login
-            </button>
-          </form>
-          <p className="text-center text-gray-600 mt-4">
-            Don't have an account? <br />
-            <NavLink to="/register" className="text-blue-700 font-semibold">
-              Register here
-            </NavLink>
-          </p>
-        </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className={`btn btn-primary w-full mt-4 ${
+              loading ? "cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
+          >
+            {loading ? <PuffLoader size={24} color="#fff" /> : "Login"}
+          </button>
+        </form>
+
+        {/* Link to Register */}
+        <p className="text-center mt-4 text-sm text-gray-500">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-purple-600 hover:underline">
+            Register
+          </Link>
+        </p>
       </div>
-      <Toaster />
-    </section>
+    </motion.div>
   );
 };
 

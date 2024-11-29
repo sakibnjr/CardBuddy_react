@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { AiOutlineLogout } from "react-icons/ai";
 import MobileMenu from "./MobileMenu";
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userName, setUserName] = useState(""); // State to store the user's name
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -12,6 +16,17 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   useEffect(() => {
     const loggedIn = localStorage.getItem("loggedIn") === "true";
     setIsLoggedIn(loggedIn);
+
+    // Get user data from localStorage if logged in
+    if (loggedIn) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user) {
+        setUserName(user.name);
+      } else {
+        // If not logged in, reset username to empty string
+        setUserName("");
+      }
+    }
   }, []);
 
   // Handle logout functionality
@@ -22,6 +37,9 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
     localStorage.removeItem("passWord");
 
     setIsLoggedIn(false);
+    setUserName(""); // Clear the username on logout
+    toast.success("Logged out successfully");
+    navigate("/login");
   };
 
   return (
@@ -86,17 +104,28 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
           </NavLink>
 
           {isLoggedIn ? (
-            <NavLink
-              to="/"
-              onClick={handleLogout} // Log out on click
-              className={({ isActive }) =>
-                isActive
-                  ? "text-blue-600 px-2 font-semibold"
-                  : "relative group hover:text-blue-600 px-2"
-              }
-            >
-              Logout
-            </NavLink>
+            <>
+              {/* <span className="text-gray-800 font-medium">
+                Welcome, <span className="text-blue-600">{userName}</span>
+              </span> */}
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-blue-600 px-2 font-semibold"
+                    : "relative group hover:text-blue-600 px-2"
+                }
+              >
+                Dashboard
+              </NavLink>
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-1 text-red-600 hover:text-red-800"
+              >
+                <AiOutlineLogout size={20} />
+                <span>Logout</span>
+              </button>
+            </>
           ) : (
             <NavLink
               to="/login"
