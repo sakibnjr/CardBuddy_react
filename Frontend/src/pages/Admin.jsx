@@ -112,11 +112,11 @@ const AdminPage = () => {
         <table className="table table-zebra w-full">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Balance</th>
-              <th>Actions</th>
+              <th className="font-bold text-white">#</th>
+              <th className="font-bold text-white">Name</th>
+              <th className="font-bold text-white">Email</th>
+              <th className="font-bold text-white">Balance</th>
+              <th className="font-bold text-white">Actions</th>
             </tr>
           </thead>
           <tbody>

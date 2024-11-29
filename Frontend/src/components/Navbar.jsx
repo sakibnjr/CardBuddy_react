@@ -27,7 +27,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
         setUserName("");
       }
     }
-  }, []);
+  }, [isLoggedIn]);
 
   // Handle logout functionality
   const handleLogout = () => {
@@ -105,9 +105,6 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
 
           {isLoggedIn ? (
             <>
-              {/* <span className="text-gray-800 font-medium">
-                Welcome, <span className="text-blue-600">{userName}</span>
-              </span> */}
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
@@ -118,6 +115,11 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
               >
                 Dashboard
               </NavLink>
+              <span className="text-gray-800 font-medium">
+                <span className="text-blue-600 border-x-2 px-1 border-black rounded-md">
+                  {userName}
+                </span>
+              </span>
               <button
                 onClick={handleLogout}
                 className="flex items-center space-x-1 text-red-600 hover:text-red-800"

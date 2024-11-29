@@ -37,6 +37,8 @@ const Login = ({ setIsLoggedIn }) => {
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
         toast.success("Login successful!");
+        localStorage.setItem("loggedIn", true);
+
         setIsLoggedIn(true);
         navigate("/dashboard"); // Redirect to dashboard or home
       } else {
